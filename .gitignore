@@ -1,2 +1,7 @@
+.*
+project/
+target/
+*.sbt
 *.class
 *.log
+!/.gitignore
