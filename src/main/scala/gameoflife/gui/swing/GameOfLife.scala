@@ -1,4 +1,6 @@
-package gameoflife
+package gameoflife.gui.swing
+
+import gameoflife.model._
 
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{BorderLayout, Dimension, Toolkit}
@@ -10,22 +12,22 @@ object GameOfLife {
 
   class GOLFrame(val grid: Grid, val zoom: Int = 1) extends JFrame("Conway's Game Of Life") {
 
-    val canvas = new Canvas(grid,zoom)
-    val dim = new Dimension(canvas.getWidth,canvas.getHeight)
+    val canvas = new Canvas(grid, zoom)
+    val dim = new Dimension(canvas.getWidth, canvas.getHeight)
 
     setResizable(false)
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     setLayout(new BorderLayout)
-    getContentPane().setPreferredSize(dim)
+    getContentPane.setPreferredSize(dim)
     add(canvas, BorderLayout.CENTER)
     pack()
 
     // center on screen
-    val screen = Toolkit.getDefaultToolkit.getScreenSize
-    setLocation(screen.width/2-getSize().width/2, screen.height/2-getSize().height/2)
+    val screen: Dimension = Toolkit.getDefaultToolkit.getScreenSize
+    setLocation(screen.width / 2 - getSize().width / 2, screen.height / 2 - getSize().height / 2)
     setVisible(true)
 
-    final def start = run(grid)
+    final def start(): Unit = run(grid)
 
     @tailrec
     final def run(grid: Grid): Unit = {
@@ -35,7 +37,7 @@ object GameOfLife {
       run(nextGrid)
     }
 
-    this.addMouseListener( new MouseListener {
+    this.addMouseListener(new MouseListener {
       override def mouseClicked(mouseEvent: MouseEvent): Unit = {}
       override def mousePressed(mouseEvent: MouseEvent): Unit = {}
       override def mouseReleased(mouseEvent: MouseEvent): Unit = {}
@@ -45,9 +47,8 @@ object GameOfLife {
   }
 
 
-
   def main(args: Array[String]): Unit = {
-    val frame = new GOLFrame(new Grid(500, 300),2)
-    frame.start
+    val game = new GOLFrame(new Grid(400, 300), 2)
+    game.start()
   }
 }

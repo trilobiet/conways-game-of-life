@@ -1,7 +1,9 @@
-package gameoflife
+package gameoflife.gui.swing
+
+import gameoflife.model.{Grid, LiveCell}
 
 import java.awt.image.BufferedImage
-import java.awt.{Color, Graphics, image}
+import java.awt.{Color, Graphics}
 import javax.swing.JComponent
 
 class Canvas(var grid: Grid, val zoom: Int = 1) extends JComponent {
