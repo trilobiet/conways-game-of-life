@@ -8,8 +8,16 @@ import java.lang.Thread.sleep
 import javax.swing.{JFrame, WindowConstants}
 import scala.annotation.tailrec
 
+/**
+ * A Swing UI Interface for Conway's Game of Life
+ */
 object GameOfLife {
 
+  /**
+   * Create a new Game of Life Grid and behold its evolution
+   * @param grid A populated Grid with Dead and Live Cells
+   * @param zoom Zoom factor
+   */
   class GOLFrame(val grid: Grid, val zoom: Int = 1) extends JFrame("Conway's Game Of Life") {
 
     val canvas = new Canvas(grid, zoom)
@@ -32,7 +40,7 @@ object GameOfLife {
     @tailrec
     final def run(grid: Grid): Unit = {
       canvas.setGrid(grid)
-      val nextGrid = nextGeneration(grid)
+      val nextGrid = grid.nextGeneration()
       sleep(50)
       run(nextGrid)
     }
@@ -47,8 +55,29 @@ object GameOfLife {
   }
 
 
+  /**
+   * Experiment with different patterns, offsets and grid sizes here
+   */
   def main(args: Array[String]): Unit = {
-    val game = new GOLFrame(new Grid(400, 300), 2)
+
+    // val game = new GOLFrame( randomlyPopulatedGrid(400,300, 10), 2)
+
+    // val coordinates = PatternLib.getPatternArray(PatternLib.against_the_grain,40,30)
+    // val game = new GOLFrame( coordinatesPopulatedGrid(120,120, coordinates), 4)
+
+    // val coordinates = PatternLib.getPatternArray(PatternLib.r_pentomino,95,80)
+    // val game = new GOLFrame( coordinatesPopulatedGrid(200,150, coordinates), 3)
+
+    // val coordinates = PatternLib.getPatternArray(PatternLib.centinal,75,65)
+    // val game = new GOLFrame( coordinatesPopulatedGrid(200,150, coordinates), 3)
+
+    // val coordinates = PatternLib.getPatternArray(PatternLib.non_monotonic,475,25)
+    // val game = new GOLFrame( coordinatesPopulatedGrid(500,60, coordinates), 3)
+
+    // watch this one crash in the left edge!
+    val coordinates = PatternLib.getPatternArray(PatternLib.hammerhead,275,30)
+    val game = new GOLFrame( coordinatesPopulatedGrid(300,80, coordinates), 3)
+
     game.start()
   }
 }

@@ -3,24 +3,50 @@ package gameoflife.model
 import scala.math.{max, min}
 
 /**
- * Grid Class TODO: describe
+ * Grid Class
  *
  * @author acdhirr
- * @param width
- * @param height
- * @param cells
+ * @param width Width of grid in cells
+ * @param height Height of grid in cells
+ * @param cells Array of Cells (DeadCell and LiveCell)
  */
 class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
 
   /**
-   * Overloaded constructor populates a Grid randomly
+   * Get Cell at position (x,y)
    *
-   * @param width
-   * @param height
+   * @author acdhirr
+   * @param x x coordinate
+   * @param y y coordinate
+   * @return Cell at position (x,y)
    */
-  def this(width: Int, height: Int) = this(width, height, randomCells(width * height))
-
   def apply(x: Int, y: Int): Cell = cells((y * width) + x)
+
+  /**
+   * Set cell at (x,y) alive when dead and vice versa
+   *
+   * @author acdhirr
+   * @param x x coordinate
+   * @param y y coordinate
+   * @return A Grid with the modified Cell
+   */
+  def toggle(x: Int, y: Int): Grid = {
+
+    cells((y * width) + x) = this(x,y) match {
+      case DeadCell() => LiveCell()
+      case LiveCell() => DeadCell()
+    }
+    new Grid(width, height, cells)
+  }
+
+  /**
+   * Clear grid
+   * @return A Grid with only DeadCells
+   */
+  def clear(): Grid = {
+    for (i <- cells.indices) cells(i) = DeadCell()
+    new Grid(width, height, cells)
+  }
 
   /**
    * Any live cell with two or three live neighbours survives.
@@ -28,8 +54,8 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
    *
    * @author acdhirr
-   * @param x
-   * @param y
+   * @param x x coordinate
+   * @param y y coordinate
    * @return either a LiveCell or a DeadCell depending on the neighbours following Conway's rules
    */
   def evolute(x: Int, y: Int): Cell = {
@@ -47,8 +73,8 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
    * Count alive cells around position (x,y)
    *
    * @author acdhirr
-   * @param x
-   * @param y
+   * @param x x coordinate
+   * @param y y coordinate
    * @return number of LiveCells neighbouring (x,y)
    */
   def neighbourCount(x: Int, y: Int): Int = {
@@ -65,6 +91,26 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
       }
     }
   }.sum
+
+
+  /**
+   * Evolute a Grid to the next generation
+   *
+   * @author acdhirr
+   * @return The Grid of Cells that descends from Grid 'parent' following Conway's rules
+   */
+  def nextGeneration(): Grid = {
+
+    val cells = for (
+      y <- 0 until height;
+      x <- 0 until width
+    ) yield {
+      evolute(x, y)
+    }
+    new Grid(width, height, cells.toArray)
+  }
+
+
 
 }
 

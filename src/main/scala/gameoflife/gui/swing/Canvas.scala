@@ -11,14 +11,14 @@ class Canvas(var grid: Grid, val zoom: Int = 1) extends JComponent {
   override def getWidth: Int = grid.width * zoom
   override def getHeight: Int = grid.height * zoom
 
-  def setGrid(g: Grid) = {
+  def setGrid(g: Grid):Unit = {
     grid = g
     repaint()
   }
 
-  override def paintComponent(gcan: Graphics) = {
+  override def paintComponent(graphics: Graphics):Unit = {
 
-    super.paintComponent(gcan)
+    super.paintComponent(graphics)
 
     val width = getWidth
     val height = getHeight
@@ -46,7 +46,7 @@ class Canvas(var grid: Grid, val zoom: Int = 1) extends JComponent {
       }
     }
 
-    gcan.drawImage(img, 0, 0, null)
+    graphics.drawImage(img, 0, 0, null)
   }
 
   def setPixels(x: Int, y: Int, size: Int, img: BufferedImage, rgb:Int): Unit = {
