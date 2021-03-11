@@ -13,14 +13,14 @@ trait PatternLib {
    * Get all unique letters for which patterns exist
    * @return List of letters
    */
-  def readLetters(): Seq[Char]
+  def getLetters(): Seq[Char]
 
   /**
    * Get all patterns starting with letter
    * @param letter first letter of patterns
    * @return A map of pattern names and pattern code
    */
-  def readPatterns(letter: String): Map[String,Pattern]
+  def getPatterns(letter: String): Map[String,Pattern]
 
   /**
    * Get Pattern by its name
@@ -39,7 +39,7 @@ trait PatternLib {
    * @param yOffset Number of cells to add from the top edge.
    * @return An array of coordinates containing the live cells in a pattern.
    */
-  def getPatternArray(pattern: Pattern, xOffset: Int = 0, yOffset: Int = 0): Array[Coordinate] = {
+  def getLiveCellsFromPattern(pattern: Pattern, xOffset: Int = 0, yOffset: Int = 0): Array[Coordinate] = {
 
     def arrayFromLine(string: String, lineNumber: Int) = {
 

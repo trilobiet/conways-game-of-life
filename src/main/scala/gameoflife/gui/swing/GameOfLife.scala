@@ -43,7 +43,7 @@ object GameOfLife {
     controls.add(parallelismLabel)
 
 
-    println("patterns: " + ResourcePatterns.readPatterns("h"))
+    println("patterns: " + new ResourcePatterns("/library.txt").getPatterns("h"))
 
     //---------------------
 
@@ -100,7 +100,7 @@ object GameOfLife {
     // val coordinates = PatternLib.getPatternArray(PatternLib.hammerhead,275,30)
     // val game = new GOLFrame( coordinatesPopulatedGrid(300,80, coordinates), 3)
 
-    val coordinates = HardcodedPatterns.getPatternArray(HardcodedPatterns.getPattern("pentadecathlon"),140,96)
+    val coordinates = HardcodedPatterns.getLiveCellsFromPattern(HardcodedPatterns.getPattern("pentadecathlon"),140,96)
     val game = new GOLFrame( coordinatesPopulatedGrid(300,200, coordinates), 3)
 
     game.start()

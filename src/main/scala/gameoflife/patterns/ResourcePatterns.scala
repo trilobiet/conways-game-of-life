@@ -11,7 +11,7 @@ import scala.io.Source
  * Patterns are stored in directory 'patterns' and then in
  * subdirectories named by their first letter.
  */
-object ResourcePatterns extends PatternLib {
+class ResourcePatterns(val path: String) extends PatternLib {
 
   // Init patterns
   private val patterns = {
@@ -24,7 +24,7 @@ object ResourcePatterns extends PatternLib {
    *
    * @return List of letters
    */
-  override def readLetters(): Seq[Char] = {
+  override def getLetters(): Seq[Char] = {
     patterns.map(_._1.charAt(0)).toSet.toSeq.sorted
   }
 
@@ -34,7 +34,7 @@ object ResourcePatterns extends PatternLib {
    * @param letter First letter of requested patterns
    * @return A map of pattern names and patterns
    */
-  override def readPatterns(letter: String): Map[String, Pattern] = {
+  override def getPatterns(letter: String): Map[String, Pattern] = {
     patterns.filter(_._1.startsWith(letter))
   }
 
@@ -53,7 +53,7 @@ object ResourcePatterns extends PatternLib {
    * @return A Map (name -> pattern)
    */
   private def readLibrary() = {
-    val fileStream = getClass.getResourceAsStream("/library.txt")
+    val fileStream = getClass.getResourceAsStream(path) // "/library.txt"
     val lines: Iterator[String] = Source.fromInputStream(fileStream).getLines
     val patternDefs: Array[String] = lines.mkString("\n").split("\n\n")
     val mappings = patternDefs
