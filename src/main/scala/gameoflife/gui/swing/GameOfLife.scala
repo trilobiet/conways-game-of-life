@@ -1,11 +1,13 @@
 package gameoflife.gui.swing
 
 import gameoflife.model._
+import gameoflife.patterns.{HardcodedPatterns, ResourcePatterns}
 
 import java.awt.event.{MouseEvent, MouseListener}
-import java.awt.{BorderLayout, Dimension, Toolkit}
+import java.awt.{BorderLayout, Dimension, GridLayout, Toolkit}
 import java.lang.Thread.sleep
-import javax.swing.{JFrame, WindowConstants}
+import javax.swing._
+import javax.swing.{BorderFactory, JFrame, JPanel, WindowConstants}
 import scala.annotation.tailrec
 
 /**
@@ -20,12 +22,32 @@ object GameOfLife {
    */
   class GOLFrame(val grid: Grid, val zoom: Int = 1) extends JFrame("Conway's Game Of Life") {
 
-    val canvas = new Canvas(grid, zoom)
-    val dim = new Dimension(canvas.getWidth, canvas.getHeight)
-
-    setResizable(false)
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     setLayout(new BorderLayout)
+
+    val canvas = new Canvas(grid, zoom)
+    val dim = new Dimension(canvas.getWidth+100, canvas.getHeight)
+
+    //----------
+
+    val rightpanel = new JPanel
+    rightpanel.setBorder(BorderFactory.createEtchedBorder(border.EtchedBorder.LOWERED))
+    rightpanel.setLayout(new BorderLayout)
+    add(rightpanel, BorderLayout.EAST)
+
+    val controls = new JPanel
+    controls.setLayout(new GridLayout(0, 2))
+    rightpanel.add(controls, BorderLayout.NORTH)
+
+    val parallelismLabel = new JLabel("Whatever")
+    controls.add(parallelismLabel)
+
+
+    println("patterns: " + ResourcePatterns.readPatterns("h"))
+
+    //---------------------
+
+    setResizable(false)
     getContentPane.setPreferredSize(dim)
     add(canvas, BorderLayout.CENTER)
     pack()
@@ -75,8 +97,11 @@ object GameOfLife {
     // val game = new GOLFrame( coordinatesPopulatedGrid(500,60, coordinates), 3)
 
     // watch this one crash in the left edge!
-    val coordinates = PatternLib.getPatternArray(PatternLib.hammerhead,275,30)
-    val game = new GOLFrame( coordinatesPopulatedGrid(300,80, coordinates), 3)
+    // val coordinates = PatternLib.getPatternArray(PatternLib.hammerhead,275,30)
+    // val game = new GOLFrame( coordinatesPopulatedGrid(300,80, coordinates), 3)
+
+    val coordinates = HardcodedPatterns.getPatternArray(HardcodedPatterns.getPattern("pentadecathlon"),140,96)
+    val game = new GOLFrame( coordinatesPopulatedGrid(300,200, coordinates), 3)
 
     game.start()
   }

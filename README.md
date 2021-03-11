@@ -24,4 +24,7 @@ See https://alvinalexander.com/scala/sbt-how-build-single-executable-jar-file-as
   - Step evolution
   - Choose preset pattern 
   - Toggle Cell   
+  - Keep track of generation number
+  - scrape patterns from https://www.conwaylife.com/ref/lexicon
+  - txt library version of patterns  
 

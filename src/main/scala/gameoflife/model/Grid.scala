@@ -15,7 +15,6 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
   /**
    * Get Cell at position (x,y)
    *
-   * @author acdhirr
    * @param x x coordinate
    * @param y y coordinate
    * @return Cell at position (x,y)
@@ -25,7 +24,6 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
   /**
    * Set cell at (x,y) alive when dead and vice versa
    *
-   * @author acdhirr
    * @param x x coordinate
    * @param y y coordinate
    * @return A Grid with the modified Cell
@@ -49,11 +47,11 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
   }
 
   /**
+   * This is Conway's Algorithm:
    * Any live cell with two or three live neighbours survives.
    * Any dead cell with three live neighbours becomes a live cell.
    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
    *
-   * @author acdhirr
    * @param x x coordinate
    * @param y y coordinate
    * @return either a LiveCell or a DeadCell depending on the neighbours following Conway's rules
@@ -64,15 +62,14 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
     val c = neighbourCount(x, y)
     curCell match {
       case DeadCell() if c == 3 => LiveCell()
-      case LiveCell() if c >> 1 == 1 => LiveCell() // selects 2 and 3
+      case LiveCell() if c >> 1 == 1 => LiveCell() // binary shift selects 2 and 3
       case _ => DeadCell()
     }
   }
 
   /**
-   * Count alive cells around position (x,y)
+   * Count live cells neighbouring position (x,y)
    *
-   * @author acdhirr
    * @param x x coordinate
    * @param y y coordinate
    * @return number of LiveCells neighbouring (x,y)
@@ -84,7 +81,6 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
       if (nx, ny) != (x, y); // not a neighbour
       c = this (nx, ny)
     ) yield {
-      // if (c.isInstanceOf[LiveCell]) 1 else 0
       c match {
         case DeadCell() => 0
         case LiveCell() => 1
@@ -94,10 +90,9 @@ class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
 
 
   /**
-   * Evolute a Grid to the next generation
+   * Evolute this Grid to the next generation
    *
-   * @author acdhirr
-   * @return The Grid of Cells that descends from Grid 'parent' following Conway's rules
+   * @return The Grid of Cells that descends from the current Grid following Conway's rules
    */
   def nextGeneration(): Grid = {
 

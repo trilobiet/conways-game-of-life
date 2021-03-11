@@ -1,5 +1,9 @@
 package gameoflife
 
+/**
+ * Model package
+ * @author acdhirr
+ */
 package object model {
 
   case class Coordinate(x:Int, y:Int)
@@ -12,7 +16,7 @@ package object model {
   case class LiveCell() extends Cell
 
   /**
-   * get a randomly populated Grid
+   * Get a randomly populated Grid
    *
    * @author acdhirr
    * @param width width in cells
@@ -33,7 +37,10 @@ package object model {
   }
 
   /**
+   * Get a grid populated with live cells as provided by the 'coordinates' array.
+   * Remaining cells will be dead.
    *
+   * @author acdhirr
    * @param width width in cells
    * @param height height in cells
    * @param coordinates array with coordinates of live cells

@@ -1,0 +1,5 @@
+package patterns
+
+class PatternTests {
+
+}
