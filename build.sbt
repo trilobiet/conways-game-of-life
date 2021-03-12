@@ -7,3 +7,4 @@ version := "0.1"
 scalaVersion := "2.13.4"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.0"
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"

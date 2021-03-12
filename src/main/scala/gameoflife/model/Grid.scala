@@ -10,7 +10,7 @@ import scala.math.{max, min}
  * @param height Height of grid in cells
  * @param cells Array of Cells (DeadCell and LiveCell)
  */
-class Grid(val width: Int, val height: Int, private val cells: Array[Cell]) {
+class Grid(val width: Int, val height: Int, val cells: Array[Cell]) {
 
   /**
    * Get Cell at position (x,y)

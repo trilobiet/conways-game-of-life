@@ -29,8 +29,15 @@ class ResourcePatterns(val path: String) extends PatternLib {
   }
 
   /**
+   * Get all patterns
+   * @return A map of pattern names and pattern code
+   */
+  override def getPatterns(): Map[String, Pattern] = {
+    patterns
+  }
+
+  /**
    * Get all patterns starting with letter
-   *
    * @param letter First letter of requested patterns
    * @return A map of pattern names and patterns
    */

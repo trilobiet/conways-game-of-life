@@ -16,6 +16,12 @@ trait PatternLib {
   def getLetters(): Seq[Char]
 
   /**
+   * Get all patterns
+   * @return A map of pattern names and pattern code
+   */
+  def getPatterns(): Map[String,Pattern]
+
+  /**
    * Get all patterns starting with letter
    * @param letter first letter of patterns
    * @return A map of pattern names and pattern code

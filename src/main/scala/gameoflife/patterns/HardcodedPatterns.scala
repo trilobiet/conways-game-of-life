@@ -10,7 +10,7 @@ import scala.collection.mutable
  */
 object HardcodedPatterns extends PatternLib {
 
-  var patterns: mutable.LinkedHashMap[String,Pattern] = mutable.LinkedHashMap[String,Pattern]()
+  private var patterns: mutable.LinkedHashMap[String,Pattern] = mutable.LinkedHashMap[String,Pattern]()
 
   /**
    * Get all unique letters for which patterns exist
@@ -18,6 +18,14 @@ object HardcodedPatterns extends PatternLib {
    */
   override def getLetters(): Seq[Char] = {
     patterns.map(_._1.charAt(0)).toSet.toSeq.sorted
+  }
+
+  /**
+   * Get all patterns
+   * @return A map of pattern names and pattern code
+   */
+  override def getPatterns(): Map[String, Pattern] = {
+    patterns.toMap
   }
 
   /**
@@ -35,38 +43,38 @@ object HardcodedPatterns extends PatternLib {
    * @param name Name of pattern
    * @return A Pattern
    */
-  override def getPattern(name: String): Pattern = patterns(name)
-
+  override def getPattern(name: String): Pattern =
+    patterns(name)
 
   /*
-   *  The Library
+   *  The Hardcoded Library
    *
-   */
+   ======================================================== */
 
   patterns += ("blinker" -> Pattern(
     """
       |OOO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("toad" -> Pattern(
     """
       |.OOO
       |OOO.
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("acorn" -> Pattern(
     """
       |.O.....
       |...O...
       |OO..OOO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("pentadecathlon" -> Pattern(
     """
       |..O....O..
       |OO.OOOO.OO
       |..O....O..
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("gospers_glider_gun" -> Pattern(
     """
@@ -79,7 +87,7 @@ object HardcodedPatterns extends PatternLib {
       |..........O.....O.......O...........
       |...........O...O....................
       |............OO......................
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("p54_shuttle" -> Pattern(
     """
@@ -100,7 +108,7 @@ object HardcodedPatterns extends PatternLib {
       |.O.O.......O.............O.O.
       |.O.........................O.
       |OO.........................OO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
     patterns += ("koks_galaxy" -> Pattern(
     """
@@ -113,8 +121,7 @@ object HardcodedPatterns extends PatternLib {
       |OO.......
       |OO.OOOOOO
       |OO.OOOOOO
-      |""".stripMargin
-  ))
+      |""".stripMargin.trim))
 
   patterns += ("against_the_grain" -> Pattern(
     """
@@ -171,15 +178,14 @@ object HardcodedPatterns extends PatternLib {
       |O...................................O
       |.OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO.
       |...O..O..O..O..O..O..O..O..O..O..O...
-      |""".stripMargin
-  ))
+      |""".stripMargin.trim))
 
   patterns += ("r_pentomino" -> Pattern(
     """
       |.OO
       |OO.
       |.O.
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("centinal" -> Pattern(
     """
@@ -200,7 +206,7 @@ object HardcodedPatterns extends PatternLib {
       |.O.O.....................OO.....................O.O.
       |.O................................................O.
       |OO................................................OO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("non_monotonic" -> Pattern(
     """
@@ -215,7 +221,7 @@ object HardcodedPatterns extends PatternLib {
       |..O.O..........O...OO
       |......OOO.O.OOO......
       |..........OO.O.......
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("x66" -> Pattern(
     """
@@ -230,7 +236,7 @@ object HardcodedPatterns extends PatternLib {
       |O..OOO..O
       |OO.......
       |..O......
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("candelabra" -> Pattern(
     """
@@ -240,7 +246,7 @@ object HardcodedPatterns extends PatternLib {
       |.O..O.OOOO.O..O.
       |....O.O..O.O....
       |.....O....O.....
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("hammerhead" -> Pattern(
     """
@@ -262,7 +268,7 @@ object HardcodedPatterns extends PatternLib {
       |OO.OOO.......O.....
       |.OO...........O...O
       |................O..
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("hectic" -> Pattern(
     """
@@ -305,7 +311,7 @@ object HardcodedPatterns extends PatternLib {
       |.......................................
       |...............OO......................
       |...............OO......................
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("heisenburp_device" -> Pattern(
     """
@@ -318,7 +324,7 @@ object HardcodedPatterns extends PatternLib {
       |.........OO
       |........O.O
       |..........O
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("stamp_collection" -> Pattern(
     """
@@ -345,8 +351,7 @@ object HardcodedPatterns extends PatternLib {
       |O......O.O.O....O....O......O..O...........O...
       |..........................................OO...
       |O.O.O..O...O....O....O.O.O..O...O.........O.O..
-      |""".stripMargin))
-
+      |""".stripMargin.trim))
 
   patterns += ("acdhirr1" -> Pattern(
     """
@@ -359,7 +364,7 @@ object HardcodedPatterns extends PatternLib {
       |OO.....OO..OO.....OO
       |OOOOOOOOO..OOOOOOOOO
       |OOOOOOOOO..OOOOOOOOO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("acdhirr2" -> Pattern(
     """
@@ -385,7 +390,7 @@ object HardcodedPatterns extends PatternLib {
       |OOOOOOOOOOO
       |...........
       |OOOOOOOOOOO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   // Text to ascii: http://patorjk.com/software/taag/#p=display&h=0&w=.&f=Banner3&t=ACDHIRR
 
@@ -398,7 +403,7 @@ object HardcodedPatterns extends PatternLib {
       |OOOOOOOOO.OO.......OO.....OO.OO.....OO..OO..OO...OO...OO...OO..
       |OO.....OO.OO....OO.OO.....OO.OO.....OO..OO..OO....OO..OO....OO.
       |OO.....OO..OOOOOO..OOOOOOOO..OO.....OO.OOOO.OO.....OO.OO.....OO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("text_max" -> Pattern(
     """
@@ -409,7 +414,7 @@ object HardcodedPatterns extends PatternLib {
       |OO.....OO.OOOOOOOOO...OO.OO..
       |OO.....OO.OO.....OO..OO...OO.
       |OO.....OO.OO.....OO.OO.....OO
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("text_god" -> Pattern(
     """
@@ -420,7 +425,7 @@ object HardcodedPatterns extends PatternLib {
       |OO....OO..OO.....OO.OO.....OO
       |OO....OO..OO.....OO.OO.....OO
       |.OOOOOO....OOOOOOO..OOOOOOOO.
-      |""".stripMargin))
+      |""".stripMargin.trim))
 
   patterns += ("text_time" -> Pattern(
     """
@@ -429,7 +434,6 @@ object HardcodedPatterns extends PatternLib {
       |.O..O.O...O.OOOO
       |.O..O.O...O.O...
       |.O..O.O...O.OOOO
-      |""".stripMargin
-  ))
+      |""".stripMargin.trim))
 
 }
