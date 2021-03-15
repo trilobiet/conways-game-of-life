@@ -1,14 +1,13 @@
 package gameoflife.gui.swing
 
 import gameoflife.model._
+import gameoflife.patterns
 import gameoflife.patterns.{HardcodedPatterns, ResourcePatterns}
 
-import java.awt.event.{MouseEvent, MouseListener}
-import java.awt.{BorderLayout, Dimension, GridLayout, Toolkit}
-import java.lang.Thread.sleep
+import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.{BorderLayout, Color, Dimension, GridLayout, Toolkit}
 import javax.swing._
 import javax.swing.{BorderFactory, JFrame, JPanel, WindowConstants}
-import scala.annotation.tailrec
 
 /**
  * A Swing UI Interface for Conway's Game of Life
@@ -22,58 +21,105 @@ object GameOfLife {
    */
   class GOLFrame(val grid: Grid, val zoom: Int = 1) extends JFrame("Conway's Game Of Life") {
 
+    // Initialization -------------------------------
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     setLayout(new BorderLayout)
+    val startGrid = grid
 
-    val canvas = new Canvas(grid, zoom)
-    val dim = new Dimension(canvas.getWidth+100, canvas.getHeight)
+    // Constants ------------------------------------
+    val rightpanelWidth = 150
+    val canvas = new GridCanvas(grid, zoom)
+    val dim = new Dimension(canvas.getWidth + rightpanelWidth, canvas.getHeight)
 
-    //----------
-
+    // Rightpanel: controls -------------------------
     val rightpanel = new JPanel
     rightpanel.setBorder(BorderFactory.createEtchedBorder(border.EtchedBorder.LOWERED))
+    val rdim = new Dimension(rightpanelWidth, canvas.getHeight)
+    rightpanel.setPreferredSize(rdim)
+    rightpanel.setMaximumSize(rdim)
+    rightpanel.setMinimumSize(rdim)
     rightpanel.setLayout(new BorderLayout)
+    rightpanel.setBackground(Color.lightGray)
     add(rightpanel, BorderLayout.EAST)
 
     val controls = new JPanel
-    controls.setLayout(new GridLayout(0, 2))
+    controls.setLayout(new GridLayout(0, 1))
     rightpanel.add(controls, BorderLayout.NORTH)
 
-    val parallelismLabel = new JLabel("Whatever")
-    controls.add(parallelismLabel)
+    // Control: Step evolution ----------------------
+    val stepButton = new JButton("Step")
+    stepButton.addActionListener(_ => step())
+    controls.add(stepButton)
 
+    // Control: Start/pause evolution ----------------------
+    val startButton = new JToggleButton("Start/Pause")
+    val startTimer = new javax.swing.Timer(20, _ => step())
+    startButton.addActionListener( _ => {
+      if (startButton.isSelected) startTimer.start()
+      else startTimer.stop()
+    })
+    controls.add(startButton)
 
-    //println("patterns: " + new ResourcePatterns("/library.txt").getPatterns("h"))
+    // Control: Reset evolution ----------------------
+    val resetButton = new JButton("Reset")
+    resetButton.addActionListener(_ => reset())
+    controls.add(resetButton)
 
-    //---------------------
+    // Control: Statistics info box ----------------------
+    val infoBox = new GridInfo
+    infoBox.setRows(2)
+    infoBox.setBorder(BorderFactory.createLoweredBevelBorder)
+    infoBox.setBorder(BorderFactory.createEmptyBorder(10,10,10,10))
+    infoBox.setBackground(new Color(0,0,0))
+    infoBox.setForeground(new Color(0,200,0))
+    rightpanel.add(infoBox, BorderLayout.SOUTH)
 
+    // Control: Pattern pickers -----------------------------------
+    val patternsLib = new ResourcePatterns("/library.txt")
+    val letters = patternsLib.getLetters().map(_.toString).toArray
+    val letterCombo = new JComboBox[String](letters)
+    letterCombo.addActionListener( new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        val letter = letterCombo.getItemAt(letterCombo.getSelectedIndex)
+        val patterns: Array[String] = patternsLib.getPatterns(letter).map(_._1).toArray
+        patternsCombo.setModel(new DefaultComboBoxModel[String](patterns))
+      }
+    })
+    controls.add(letterCombo)
+    val patternsCombo = new JComboBox[String]()
+    controls.add(patternsCombo)
+
+    // Positioning and wrapping up -------------------------------
     setResizable(false)
     getContentPane.setPreferredSize(dim)
     add(canvas, BorderLayout.CENTER)
     pack()
-
     // center on screen
     val screen: Dimension = Toolkit.getDefaultToolkit.getScreenSize
     setLocation(screen.width / 2 - getSize().width / 2, screen.height / 2 - getSize().height / 2)
     setVisible(true)
 
-    final def start(): Unit = run(grid)
+    // Function step: advance to next evolution
+    def step(): Unit =
+      SwingUtilities.invokeLater(() => {
+        val nextGrid = canvas.grid.nextGeneration()
+        infoBox.updateStatistics(nextGrid)
+        canvas.setGrid(nextGrid)
+      })
 
-    @tailrec
-    final def run(grid: Grid): Unit = {
-      canvas.setGrid(grid)
-      val nextGrid = grid.nextGeneration()
-      sleep(50)
-      run(nextGrid)
+    // Function step: advance to next evolution
+    def reset(): Unit = {
+      startTimer.stop()
+      infoBox.reset()
+      canvas.setGrid(startGrid)
     }
 
-    this.addMouseListener(new MouseListener {
-      override def mouseClicked(mouseEvent: MouseEvent): Unit = {}
-      override def mousePressed(mouseEvent: MouseEvent): Unit = {}
-      override def mouseReleased(mouseEvent: MouseEvent): Unit = {}
-      override def mouseEntered(mouseEvent: MouseEvent): Unit = {}
-      override def mouseExited(mouseEvent: MouseEvent): Unit = {}
-    })
+  }
+
+  try {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+  } catch {
+    case _: Exception => println("Cannot set look and feel, using the default one.")
   }
 
 
@@ -104,8 +150,7 @@ object GameOfLife {
     val screenSize = (300,200)
     val coordinates = HardcodedPatterns.getLiveCellsFromPattern(pattern,(screenSize._1-pattern.width)/2,(screenSize._2-pattern.height)/2)
     println(s"Pattern width=${pattern.width}; height=${pattern.height}")
-    val game = new GOLFrame( coordinatesPopulatedGrid(300,200, coordinates), 3)
-
-    game.start()
+    val game = new GOLFrame( coordinatesPopulatedGrid(300,200, coordinates), 4)
+    game.repaint()
   }
 }
