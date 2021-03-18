@@ -13,12 +13,17 @@ import scala.util.{Failure, Success}
  * This class holds a lot of state.
  * Since Grid is immutable, you must repeatedly pass in a new grid to build up
  * a history on which to base the statistics.
+ *
+ * @author acdhirr
  */
 class GridInfo extends JTextArea {
 
   private var newCount = Future(0)
   private var lastCount = 0
   private var generation = 0
+  private var isReset = false
+
+  reset()
 
   private def incGenerationCount = {
     generation = generation + 1
@@ -69,17 +74,26 @@ class GridInfo extends JTextArea {
 
       newCount.onComplete {
         case Success(value) => {
-          lastCount = value
+          if (isReset) {
+            lastCount = 0
+            isReset = false
+          } else {
+            lastCount = value
+          }
           updateText(generation,lastCount)
         }
       }
     }
   }
 
+  /**
+   * Reset info
+   */
   def reset(): Unit = {
-    newCount = Future(0)
+
     lastCount = 0
     generation = 0
+    isReset = true
     updateText(0,0)
   }
 

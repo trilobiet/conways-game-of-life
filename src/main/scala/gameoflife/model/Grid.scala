@@ -1,6 +1,7 @@
 package gameoflife.model
 
 import scala.math.{max, min}
+import scala.collection.parallel.CollectionConverters._
 
 /**
  * Grid Class
@@ -97,15 +98,13 @@ class Grid(val width: Int, val height: Int, val cells: Array[Cell]) {
   def nextGeneration(): Grid = {
 
     val cells = for (
-      y <- 0 until height;
+      y <- (0 until height).par;
       x <- 0 until width
     ) yield {
       evolute(x, y)
     }
     new Grid(width, height, cells.toArray)
   }
-
-
 
 }
 

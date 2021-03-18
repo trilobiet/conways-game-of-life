@@ -1,13 +1,14 @@
 package gameoflife.gui.swing
 
 import gameoflife.model._
-import gameoflife.patterns
 import gameoflife.patterns.{HardcodedPatterns, ResourcePatterns}
 
-import java.awt.event.{ActionEvent, ActionListener}
 import java.awt.{BorderLayout, Color, Dimension, GridLayout, Toolkit}
 import javax.swing._
-import javax.swing.{BorderFactory, JFrame, JPanel, WindowConstants}
+import javax.swing.plaf.FontUIResource
+import javax.swing.UIManager
+import java.awt.Font
+import javax.swing.event.{ChangeEvent, ChangeListener}
 
 /**
  * A Swing UI Interface for Conway's Game of Life
@@ -24,14 +25,17 @@ object GameOfLife {
     // Initialization -------------------------------
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     setLayout(new BorderLayout)
-    val startGrid = grid
+    setUIFont(new FontUIResource("Sans Serif", Font.PLAIN, 11)) // see method below
+
+    // save initial grid to be displayed on reset
+    var startGrid = grid
 
     // Constants ------------------------------------
     val rightpanelWidth = 150
     val canvas = new GridCanvas(grid, zoom)
     val dim = new Dimension(canvas.getWidth + rightpanelWidth, canvas.getHeight)
 
-    // Rightpanel: controls -------------------------
+    // Rightpanel: Side bar right contains controls area --------------------
     val rightpanel = new JPanel
     rightpanel.setBorder(BorderFactory.createEtchedBorder(border.EtchedBorder.LOWERED))
     val rdim = new Dimension(rightpanelWidth, canvas.getHeight)
@@ -39,31 +43,85 @@ object GameOfLife {
     rightpanel.setMaximumSize(rdim)
     rightpanel.setMinimumSize(rdim)
     rightpanel.setLayout(new BorderLayout)
-    rightpanel.setBackground(Color.lightGray)
     add(rightpanel, BorderLayout.EAST)
 
+    // Controls area --------------------
     val controls = new JPanel
     controls.setLayout(new GridLayout(0, 1))
     rightpanel.add(controls, BorderLayout.NORTH)
 
-    // Control: Step evolution ----------------------
-    val stepButton = new JButton("Step")
-    stepButton.addActionListener(_ => step())
-    controls.add(stepButton)
+    // Control: Pattern picker dialog -----------------------------------
+    val dialog = new LibraryDialog(this, "/library.txt")
+    val patternsButton = new JButton("Library")
+    patternsButton.addActionListener( _ => {
+      dialog.setVisible(true)
+    })
+    controls.add(patternsButton)
+
+    // Control: Separator ----------------------------------
+    controls.add(new JSeparator(SwingConstants.HORIZONTAL))
+
+    // Control: Soup settings ----------------------
+    val spinnerBox = new JPanel()
+    spinnerBox.setLayout(new GridLayout(0, 2))
+    val spinnerText = new JLabel("Soup ratio")
+    spinnerBox.add(spinnerText)
+    val bodiesSpinner = new JSpinner(new SpinnerNumberModel(15, 2, 40, 1))
+    spinnerBox.add(bodiesSpinner)
+    controls.add(spinnerBox)
+    val soupButton = new JButton("Random Soup")
+    soupButton.addActionListener(_ => {
+      setRunning(false)
+      resetWithGrid(soupPopulatedGrid(grid.width, grid.height, bodiesSpinner.getValue.asInstanceOf[Int]))
+    })
+    controls.add(soupButton)
+
+    // Control: Separator ----------------------------------
+    controls.add(new JSeparator(SwingConstants.HORIZONTAL))
 
     // Control: Start/pause evolution ----------------------
-    val startButton = new JToggleButton("Start/Pause")
-    val startTimer = new javax.swing.Timer(20, _ => step())
+    val startButton = new JToggleButton("▶")
+    val startTimer = new javax.swing.Timer(50, _ => step())
     startButton.addActionListener( _ => {
-      if (startButton.isSelected) startTimer.start()
-      else startTimer.stop()
+      if (startButton.isSelected) setRunning(true)
+      else setRunning(false)
     })
     controls.add(startButton)
 
+    // Control: Step evolution ----------------------
+    val stepButton = new JButton("Step")
+    stepButton.addActionListener(_ => {
+      setRunning(false)
+      step()
+    })
+    controls.add(stepButton)
+
     // Control: Reset evolution ----------------------
     val resetButton = new JButton("Reset")
-    resetButton.addActionListener(_ => reset())
+    resetButton.addActionListener(_ => {
+      setRunning(false)
+      resetWithGrid(startGrid)
+    })
     controls.add(resetButton)
+
+    // Control: Clear grid ----------------------
+    val clearButton = new JButton("Clear")
+    clearButton.addActionListener( _ => {
+      setRunning(false)
+      canvas.setGrid(grid.clear())
+    })
+    controls.add(clearButton)
+
+    // Control: Separator --------------------------------------
+    controls.add(new JSeparator(SwingConstants.HORIZONTAL))
+
+    // Control: Predictive coloring checkbox --------------------
+    val cbPredictive = new JCheckBox("Predictive colors")
+    cbPredictive.addActionListener(_ => {
+      if (cbPredictive.isSelected) canvas.setPredictive(true)
+      else canvas.setPredictive(false)
+    })
+    controls.add(cbPredictive)
 
     // Control: Statistics info box ----------------------
     val infoBox = new GridInfo
@@ -73,21 +131,6 @@ object GameOfLife {
     infoBox.setBackground(new Color(0,0,0))
     infoBox.setForeground(new Color(0,200,0))
     rightpanel.add(infoBox, BorderLayout.SOUTH)
-
-    // Control: Pattern pickers -----------------------------------
-    val patternsLib = new ResourcePatterns("/library.txt")
-    val letters = patternsLib.getLetters().map(_.toString).toArray
-    val letterCombo = new JComboBox[String](letters)
-    letterCombo.addActionListener( new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        val letter = letterCombo.getItemAt(letterCombo.getSelectedIndex)
-        val patterns: Array[String] = patternsLib.getPatterns(letter).map(_._1).toArray
-        patternsCombo.setModel(new DefaultComboBoxModel[String](patterns))
-      }
-    })
-    controls.add(letterCombo)
-    val patternsCombo = new JComboBox[String]()
-    controls.add(patternsCombo)
 
     // Positioning and wrapping up -------------------------------
     setResizable(false)
@@ -100,18 +143,48 @@ object GameOfLife {
     setVisible(true)
 
     // Function step: advance to next evolution
-    def step(): Unit =
-      SwingUtilities.invokeLater(() => {
-        val nextGrid = canvas.grid.nextGeneration()
-        infoBox.updateStatistics(nextGrid)
-        canvas.setGrid(nextGrid)
-      })
+    def step(): Unit = {
+      val nextGrid = canvas.grid.nextGeneration()
+      infoBox.updateStatistics(nextGrid)
+      canvas.setGrid(nextGrid)
+    }
+
+    def setRunning(enabled: Boolean) = {
+      if (enabled) {
+        startTimer.start()
+        startButton.setText("⏸")
+      }
+      else {
+        startTimer.stop()
+        startButton.setText("▶")
+      }
+      startButton.setSelected(enabled)
+    }
 
     // Function step: advance to next evolution
-    def reset(): Unit = {
-      startTimer.stop()
+    def resetWithGrid(grid: Grid): Unit = {
       infoBox.reset()
-      canvas.setGrid(startGrid)
+      startGrid = grid
+      canvas.setGrid(grid)
+    }
+
+    // Load a grid from the library
+    def getGridByName(name:String) : Grid = {
+      val pattern = new ResourcePatterns("/library.txt").getPattern(name)
+      val coordinates = HardcodedPatterns.getLiveCellsFromPattern(pattern,(grid.width-pattern.width)/2,(grid.height-pattern.height)/2)
+      coordinatesPopulatedGrid(grid.width, grid.height, coordinates)
+    }
+
+    // Set a (custom) font
+    def setUIFont(f: FontUIResource): Unit = {
+      val keys = UIManager.getDefaults.keys
+      while ( {
+        keys.hasMoreElements
+      }) {
+        val key = keys.nextElement
+        val value = UIManager.get(key)
+        if (value.isInstanceOf[FontUIResource]) UIManager.put(key, f)
+      }
     }
 
   }
@@ -124,33 +197,15 @@ object GameOfLife {
 
 
   /**
-   * Experiment with different patterns, offsets and grid sizes here
+   * Main execution method
    */
   def main(args: Array[String]): Unit = {
 
-    // val game = new GOLFrame( randomlyPopulatedGrid(400,300, 10), 2)
-
-    // val coordinates = PatternLib.getPatternArray(PatternLib.against_the_grain,40,30)
-    // val game = new GOLFrame( coordinatesPopulatedGrid(120,120, coordinates), 4)
-
-    // val coordinates = PatternLib.getPatternArray(PatternLib.r_pentomino,95,80)
-    // val game = new GOLFrame( coordinatesPopulatedGrid(200,150, coordinates), 3)
-
-    // val coordinates = PatternLib.getPatternArray(PatternLib.centinal,75,65)
-    // val game = new GOLFrame( coordinatesPopulatedGrid(200,150, coordinates), 3)
-
-    // val coordinates = PatternLib.getPatternArray(PatternLib.non_monotonic,475,25)
-    // val game = new GOLFrame( coordinatesPopulatedGrid(500,60, coordinates), 3)
-
-    // watch this one crash in the left edge!
-    // val coordinates = PatternLib.getPatternArray(PatternLib.hammerhead,275,30)
-    // val game = new GOLFrame( coordinatesPopulatedGrid(300,80, coordinates), 3)
-
-    val pattern = new ResourcePatterns("/library.txt").getPattern("gliders_by_the_dozen")
-    val screenSize = (300,200)
-    val coordinates = HardcodedPatterns.getLiveCellsFromPattern(pattern,(screenSize._1-pattern.width)/2,(screenSize._2-pattern.height)/2)
-    println(s"Pattern width=${pattern.width}; height=${pattern.height}")
-    val game = new GOLFrame( coordinatesPopulatedGrid(300,200, coordinates), 4)
+    val gridSize = (300,200)
+    val game = new GOLFrame( soupPopulatedGrid(gridSize._1, gridSize._2, 15),3)
     game.repaint()
   }
+
 }
+
+

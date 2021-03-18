@@ -1,7 +1,10 @@
 package gameoflife
 
+import java.awt.Color
+
 /**
  * Model package
+ *
  * @author acdhirr
  */
 package object model {
@@ -28,10 +31,9 @@ package object model {
 
     val r = scala.util.Random
     val cells = new Array[Cell](width * height)
-    val area = cells.length / 6 to cells.length - cells.length / 6
     for (i <- cells.indices) {
       val p = r.nextInt(sparseness)
-      cells(i) = if (p < 1 && area.contains(i)) LiveCell() else DeadCell()
+      cells(i) = if (p < 1) LiveCell() else DeadCell()
     }
     new Grid(width, height, cells)
   }
@@ -57,6 +59,19 @@ package object model {
     }
 
     new Grid(width, height, cells.toArray)
+  }
+
+
+  /**
+   * Return an empty grid (only DeadCells)
+   * @param width width in cells
+   * @param height height in cells
+   * @return A grid with only dead cells
+   */
+  def emptyGrid( width:Int, height: Int ): Grid = {
+
+    val cells = Array.fill[Cell](width * height)(DeadCell())
+    new Grid(width,height,cells)
   }
 
 }

@@ -17,14 +17,6 @@ A Scala functional implementation of Conway's Game of Life
    
 See https://alvinalexander.com/scala/sbt-how-build-single-executable-jar-file-assembly/
 
-## todo
+## Swing UI
 
-- Expand UI with controls to
-  - Start/Pause/Reset evolution
-  - Step evolution
-  - Choose preset pattern 
-  - Toggle Cell   
-  - Keep track of generation number
-  - scrape patterns from https://www.conwaylife.com/ref/lexicon
-  - txt library version of patterns  
-
+![Swing UI](swing-gui.png "Conway's Game of Life")
